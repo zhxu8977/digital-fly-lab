@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f5ec" />
+    <title>灵境伙伴 · 精灵进化与数字脑实验场</title>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="game-brand">
+          <div class="brand-emblem" aria-hidden="true">✦</div>
+          <div>
+            <p class="eyebrow">SPIRIT GROVE · 每一个伙伴，都有自己的成长</p>
+            <h1>灵境伙伴 <span>进化与培养</span></h1>
+          </div>
+        </div>
+        <div class="topbar-details"><span class="build-badge">数字脑 · 开放世界</span><div class="provenance" id="provenance">正在读取连接组…</div></div>
+      </header>
+
+      <nav class="game-navigation" aria-label="游戏主要功能">
+        <button class="active" type="button" data-workspace-tab="arena"><span>🌿</span>探索世界<small>自由行动与觅食</small></button>
+        <button type="button" data-workspace-tab="collection"><span>🐾</span>伙伴图鉴<small>收集 · 培养 · 进化</small></button>
+        <button type="button" data-workspace-tab="duel"><span>⚔️</span>属性对战<small>策略与战斗成长</small></button>
+        <button type="button" data-workspace-tab="interaction"><span>📹</span>视频互动<small>和伙伴面对面</small></button>
+        <button type="button" data-workspace-tab="science"><span>🧠</span>数字脑实验<small>感知与神经通道</small></button>
+      </nav>
+
+      <section class="workspace" id="arenaWorkspace">
+        <section class="arena-card panel">
+          <div class="panel-head">
+            <div>
+              <p class="kicker">LIVE WORLD · 伙伴的每一天</p>
+              <h2>一起探索这片世界</h2>
+            </div>
+            <div class="status-pill"><i></i><span id="worldStatus">自主探索</span></div>
+          </div>
+          <div class="arena-stage">
+            <div id="arena3d" role="img" aria-label="三维数字果蝇实验场"></div>
+            <div class="arena-hud">
+              <span>SCORE <strong id="scoreValue">00</strong></span>
+              <span>饥饿度 <strong id="hungerValue">72%</strong></span>
+              <span>运动状态 <strong id="motionValue">地面行走</strong></span>
+              <span>高度 / 速度 <strong><i id="altitudeValue">0</i> / <i id="speedValue">0</i></strong></span>
+              <span>当前目标 <strong id="targetValue">搜索中</strong></span>
+            </div>
+            <div class="world-art-badge" id="worldArtStatus">检测显卡与开源场景…</div>
+            <div class="camera-hint">左键旋转 · 右键平移 · 滚轮缩放 · 1–6 切换视角 · 点击地面放置甜果</div>
+            <button class="camera-mode" id="combatCameraToggle" type="button">镜头：自动跟随</button>
+            <div class="camera-presets" role="group" aria-label="视角切换">
+              <button type="button" data-camera="overview" title="快捷键 1">1 全景</button>
+              <button type="button" data-camera="follow" title="快捷键 2">2 后方</button>
+              <button type="button" data-camera="side" title="快捷键 3">3 侧面</button>
+              <button type="button" data-camera="top" title="快捷键 4">4 俯视</button>
+              <button type="button" data-camera="combat" title="快捷键 5">5 战斗跟随</button>
+              <button type="button" data-camera="video" title="快捷键 6">6 视频通话</button>
+            </div>
+            <div class="arena-skillbar">
+              <span>快捷技能</span>
+              <div id="quickSkillBar"></div>
+              <button id="quickStopDuel" class="stop-duel-button" type="button" disabled title="停止当前练习赛，不结算培养奖励">停止对战</button>
+            </div>
+          </div>
+          <div class="legend">
+            <span><b class="dot owner"></b>我的精灵</span>
+            <span><b class="dot sugar"></b>甜果</span>
+            <span><b class="dot bitter"></b>苦果</span>
+            <span><b class="dot owner"></b>主人</span>
+            <span><b class="dot threat"></b>多属性巡逻敌人</span>
+            <span id="enemySummary">6名敌人 · 2座洞穴</span>
+            <span><b class="line vision"></b>视觉</span>
+            <span><b class="line smell"></b>气味</span>
+          </div>
+          <div class="creature-preview-strip">
+            <div><strong>今天和谁一起冒险？</strong><small>选择伙伴后，直接在世界里观察它</small></div>
+            <label>出场精灵<select id="worldSpeciesSelect" aria-label="选择探索世界的精灵"></select></label>
+            <label class="advanced-preview">身体预览
+              <select id="worldBodyPreview">
+                <option value="aerial">飞行绒团萤翼兽</option>
+                <option value="biped">瘦高关节迅影兽</option>
+                <option value="corgi">软肚短腿小柯基</option>
+                <option value="cat">四足软萌小猫</option>
+              </select>
+            </label>
+            <button id="focusCreaturePreview" type="button">近距离跟随查看</button>
+          </div>
+          <section class="robot-controls" aria-labelledby="robotControlsTitle">
+            <div class="robot-controls-heading"><strong id="robotControlsTitle">🤖 主人机器人</strong><label><input id="robotControlToggle" type="checkbox" />接管主人移动</label></div>
+            <p>按住 W / A / S / D 或方向键，也可按住下方方向按钮移动。松开即停；输入文字时不会抢占按键。</p>
+            <div class="robot-control-layout">
+              <div class="robot-direction-pad" role="group" aria-label="按住控制主人机器人方向">
+                <button type="button" data-robot-move="forward" aria-label="向前移动，按住生效">↑</button>
+                <button type="button" data-robot-move="left" aria-label="向左移动，按住生效">←</button>
+                <button type="button" data-robot-move="backward" aria-label="向后移动，按住生效">↓</button>
+                <button type="button" data-robot-move="right" aria-label="向右移动，按住生效">→</button>
+              </div>
+              <div class="robot-actions"><button id="robotCallCompanion" type="button">🔔 呼唤伙伴</button><button id="robotFollowCamera" type="button">🎥 跟随主人</button><button id="robotHome" type="button">⌂ 回到中央</button></div>
+            </div>
+            <span id="robotControlStatus" class="robot-control-status" role="status">未接管 · 伙伴保持自主行动</span>
+          </section>
+          <details class="world-details"><summary>世界操作与画面设置说明</summary><p class="arena-note">拖动鼠标环绕观察，滚轮调整距离，数字键 1–6 切换镜头。点击地面可放置食物。场景使用 Quaternius 与 Kenney 的 CC0 开源模型，并根据设备性能自动控制画质。地图为 7200 × 4800 单位，立体空域最高约 1600，山体与高台保留真实高度碰撞。精灵的感知、体力、技能、学习和立体碰撞共同参与世界行为。</p></details>
+        </section>
+
+        <aside class="control-column">
+          <section class="panel readout-panel">
+            <div class="panel-head compact">
+              <div>
+                <p class="kicker">02 · 神经输出</p>
+                <h2>它现在想做什么？</h2>
+              </div>
+              <button id="pauseButton" class="icon-button" type="button">暂停</button>
+            </div>
+            <div class="meter-grid">
+              <div class="meter-card escape"><div><span>逃逸冲动</span><strong id="escapeValue">0%</strong></div><progress id="escapeMeter" max="1" value="0"></progress><small>DNp01：驱动快速逃跑的下降神经元</small></div>
+              <div class="meter-card feed"><div><span>进食冲动</span><strong id="feedValue">0%</strong></div><progress id="feedMeter" max="1" value="0"></progress><small>MN9：控制口器进食动作的运动神经元</small></div>
+              <div class="meter-card smell"><div><span>食物气味</span><strong id="odorValue">0%</strong></div><progress id="odorMeter" max="1" value="0"></progress><small>DM1 / VA2：接收食物气味的嗅觉通道</small></div>
+              <div class="meter-card bitter"><div><span>苦味拒食</span><strong id="bitterValue">0%</strong></div><progress id="bitterMeter" max="1" value="0"></progress><small>GNG087：苦味出现时压低进食动作</small></div>
+            </div>
+          </section>
+
+          <section class="panel lab-panel">
+            <div class="panel-head compact"><div><p class="kicker">03 · 实验台</p><h2>直接给大脑刺激</h2></div></div>
+            <div class="button-grid">
+              <button data-stimulus="sweet">🍯 甜味</button>
+              <button data-stimulus="bitter">🧪 甜 + 苦</button>
+              <button data-stimulus="loom-left">◐ 左侧逼近</button>
+              <button data-stimulus="loom-right">◑ 右侧逼近</button>
+            </div>
+            <div class="switch-row">
+              <label><input id="shuffleToggle" type="checkbox" /><span></span>打乱连接对照</label>
+              <label><input id="escapeAblation" type="checkbox" /><span></span>关闭逃逸输出（DNp01）</label>
+              <label><input id="feedAblation" type="checkbox" /><span></span>关闭进食输出（MN9）</label>
+            </div>
+            <div class="world-buttons">
+              <button id="addSugar">放置甜果</button>
+              <button id="addBitter">放置苦果</button>
+              <button id="resetWorld">重置世界</button>
+            </div>
+            <div class="flight-buttons">
+              <span>飞行控制</span>
+              <button data-flight="auto" class="active">自动</button>
+              <button data-flight="takeoff">立即起飞</button>
+              <button data-flight="land">立即降落</button>
+            </div>
+            <div class="scenario-picker">
+              <p>选择复杂场景</p>
+              <div>
+                <button class="active" data-scenario="garden"><strong>生态花园</strong><small>开阔觅食 · 岩石与池塘</small></button>
+                <button data-scenario="ruins"><strong>狭窄遗迹</strong><small>墙体迷宫 · 退路受限</small></button>
+                <button data-scenario="night"><strong>夜间觅食</strong><small>低能见度 · 高收益高风险</small></button>
+                <button data-scenario="nest"><strong>巢穴防御</strong><small>保护主人 · 强敌入侵</small></button>
+              </div>
+              <p id="scenarioDescription" class="scenario-description">食物充足、视野开阔，适合观察飞行觅食和基础关系学习。</p>
+            </div>
+          </section>
+
+          <section class="panel learning-panel">
+            <div class="panel-head compact">
+              <div><p class="kicker">04 · 后天学习</p><h2>它怎样认识你、学会攻击？</h2></div>
+              <span class="mood-badge" id="relationshipLabel">保持警惕</span>
+            </div>
+            <div class="learning-meters">
+              <label><span>对主人亲密度</span><strong id="affinityValue">18%</strong><progress id="affinityMeter" max="1" value=".18"></progress></label>
+              <label><span>对环境恐惧</span><strong id="fearValue">28%</strong><progress id="fearMeter" max="1" value=".28"></progress></label>
+              <label><span>冲刺攻击熟练度</span><strong id="skillValue">12%</strong><progress id="skillMeter" max="1" value=".12"></progress></label>
+              <label><span>当前攻击意愿</span><strong id="attackValue">0%</strong><progress id="attackMeter" max="1" value="0"></progress></label>
+            </div>
+            <div class="decision-readout">
+              <div><span>估计胜算</span><strong id="winChanceValue">—</strong></div>
+              <div><span>成功逃脱概率</span><strong id="escapeChanceValue">—</strong></div>
+              <div><span>生命状态</span><strong id="healthValue">90%</strong></div>
+              <div><span>当前体力</span><strong id="staminaValue">100%</strong></div>
+              <p id="decisionReason">尚未发现需要判断的敌人。</p>
+            </div>
+            <div class="tactics-grid">
+              <label>性格
+                <select id="personalitySelect">
+                  <option value="balanced">稳健型</option>
+                  <option value="brave">勇猛型</option>
+                  <option value="cautious">谨慎型</option>
+                  <option value="curious">好奇型</option>
+                </select>
+              </label>
+              <label>敌人实力
+                <select id="enemyStrengthSelect">
+                  <option value="0.25">弱小</option>
+                  <option value="0.55" selected>势均力敌</option>
+                  <option value="0.9">明显更强</option>
+                </select>
+              </label>
+              <label>敌人态度
+                <select id="enemyHostilitySelect">
+                  <option value="0.1">路过、无敌意</option>
+                  <option value="0.55">警戒中</option>
+                  <option value="1" selected>正在攻击</option>
+                </select>
+              </label>
+              <label>攻击收益
+                <select id="attackRewardSelect">
+                  <option value="0">没有好处</option>
+                  <option value="0.35" selected>获得少量资源</option>
+                  <option value="0.8">保护主人/重要资源</option>
+                </select>
+              </label>
+              <label>逃跑环境
+                <select id="escapeRoomSelect">
+                  <option value="1" selected>开阔、有退路</option>
+                  <option value="0.5">拥挤、难逃</option>
+                  <option value="0.08">被包围、几乎无路</option>
+                </select>
+              </label>
+            </div>
+            <div class="command-row" aria-label="主人战术指令">
+              <span>主人指令</span>
+              <button class="active" data-command="autonomous">自主判断</button>
+              <button data-command="attack">尝试攻击</button>
+              <button data-command="retreat">优先撤退</button>
+              <button data-command="protect">保护主人</button>
+            </div>
+            <div class="learning-actions">
+              <button id="callOwner">🔔 主人呼唤</button>
+              <button id="feedOwner">🍯 亲手喂食</button>
+              <button id="petOwner">🤲 温柔抚摸</button>
+              <button id="trainAttack">⚔ 攻击训练</button>
+              <button id="scareCreature">⚡ 制造惊吓</button>
+              <button id="clearMemory">清除后天记忆</button>
+            </div>
+            <p class="learning-note" id="learningExplanation">互动会改变少量可塑参数，不会重新训练或篡改 MaleCNS 原始连接。</p>
+          </section>
+        </aside>
+      </section>
+
+      <section class="panel collection-panel" id="collectionPanel" data-workspace-section="collection">
+        <div class="panel-head collection-heading">
+          <div><p class="kicker">SPIRIT JOURNAL · 收集每一种可能</p><h2>我的伙伴与进化图鉴</h2><p class="panel-subtitle">挑选喜欢的伙伴，让喂食、陪伴、训练和战斗成为它的成长经历。</p></div>
+          <button class="primary-action" id="collectStarter" type="button">＋ 领养新伙伴</button>
+        </div>
+        <div class="developer-toolbar">
+          <label class="developer-toggle"><input id="developerMode" type="checkbox" checked />开发模式 · 全形态预览</label>
+          <span id="developerPreviewStatus" role="status">真实伙伴出场；图鉴中任意形态可单独开发预览。</span>
+          <button id="exitDeveloperPreview" type="button" disabled>返回真实伙伴</button>
+        </div>
+        <p class="developer-boundary">开发预览只是临时试装，不领养、不解锁图鉴、不扣资源，也不覆盖真实伙伴的等级、体力和记忆；预览时暂停培养写入，退出后继续原有进度。</p>
+        <div class="collection-resource-bar" aria-label="收集与培养资源">
+          <div><span>🐾 已收集</span><strong id="collectionCount">读取图鉴…</strong></div>
+          <div><span>🪙 成长星币</span><strong id="collectionCoins">0</strong></div>
+          <div><span>🍓 伙伴口粮</span><strong id="collectionFood">0</strong></div>
+          <div><span>💎 进化晶石</span><strong id="collectionCrystals">0</strong></div>
+        </div>
+        <div class="collection-layout">
+          <div class="collection-dex">
+            <div class="collection-filters">
+              <label class="collection-search"><span aria-hidden="true">⌕</span><input id="collectionSearch" type="search" placeholder="寻找名字、种族或特色…" aria-label="搜索精灵图鉴" /></label>
+              <select id="collectionElementFilter" aria-label="按属性筛选"><option value="all">全部属性</option></select>
+              <select id="collectionStageFilter" aria-label="按进化阶段筛选"><option value="all">全部阶段</option><option value="base">初始形态</option><option value="evolved">进化形态</option></select>
+            </div>
+            <div id="collectionGrid" class="collection-grid" aria-label="精灵图鉴"></div>
+            <p class="collection-tip">点击图鉴查看伙伴与进化路线。培养已有伙伴，达到条件后即可进化。</p>
+          </div>
+          <aside class="active-spirit-card" aria-label="当前精灵培养详情">
+            <div class="active-spirit-header"><span class="companion-label">正在培养的伙伴</span><span class="level-badge"><b id="activeSpiritLevel">Lv.1</b></span></div>
+            <div class="active-spirit-portrait" id="activeSpiritPortrait" aria-label="精灵形象"></div>
+            <h3 id="activeSpiritName">等待选择伙伴</h3>
+            <p id="activeSpiritSubtitle" class="active-spirit-subtitle">你的下一段冒险，从一个新伙伴开始。</p>
+            <label class="nickname-field">给伙伴取个名字<input id="renameSpirit" type="text" maxlength="16" placeholder="输入昵称（可选）" /></label>
+            <div class="growth-meter"><div><span>成长经验</span><strong id="activeSpiritXpText">0 / 100</strong></div><progress id="activeSpiritXp" max="100" value="0"></progress></div>
+            <div class="growth-meter bond"><div><span>羁绊与信任</span><strong>一起相处，一起成长</strong></div><progress id="activeSpiritBond" max="100" value="0"></progress></div>
+            <div class="active-spirit-stats" id="activeSpiritStats"></div>
+            <div class="cultivation-actions" aria-label="精灵培养行动">
+              <button type="button" data-cultivate="feed"><b>🍓</b><span>喂食</span><small>8 星币 · 1 口粮</small></button>
+              <button type="button" data-cultivate="play"><b>🧶</b><span>陪伴</span><small>12 星币 · 增进羁绊</small></button>
+              <button type="button" data-cultivate="power"><b>🥊</b><span>力量训练</span><small>18 星币 · 强化攻击</small></button>
+              <button type="button" data-cultivate="endurance"><b>🛡️</b><span>耐力训练</span><small>18 星币 · 生命防御</small></button>
+              <button type="button" data-cultivate="agility"><b>💨</b><span>敏捷训练</span><small>18 星币 · 强化速度</small></button>
+              <button type="button" data-cultivate="rest"><b>💤</b><span>好好休息</span><small>免费 · 恢复训练负荷</small></button>
+            </div>
+            <p class="cultivation-note">连续培养会积累训练负荷；累了就休息。经验带来等级成长，羁绊与进化晶石共同决定进化时机。</p>
+            <div id="activeSpiritTraining" class="training-readout"></div>
+            <div class="evolution-block"><h4>✦ 进化旅程</h4><div id="activeSpiritEvolution" class="evolution-timeline"></div><p id="evolutionRequirement">选中一个伙伴后，查看它的进化条件。</p><button class="evolve-button" id="evolveSpirit" type="button">让伙伴进化</button></div>
+          </aside>
+        </div>
+        <p class="collection-message" id="collectionMessage" role="status" aria-live="polite">去认识一个伙伴吧。</p>
+        <details class="collection-about"><summary>成长机制、存档与美术来源</summary><p><span id="collectionScope">图鉴正在加载原创家族与成长形态。</span>这些形态不是同数量的独立大脑线路或完全独立动画骨架。伙伴共享同一份只读 MaleCNS 线路数据中的神经子回路，各自运行独立的神经活动状态；当前不是完整果蝇大脑仿真。精灵等级、经验、羁绊、训练和进化属于游戏成长系统，不会重新训练果蝇原始连接组。每只伙伴分别保留自己的体质、性格和后天记忆，进度保存在当前浏览器；进化继承培养经历。</p><p>精灵名称、配色和成长路线为本项目原创设计，以收集和进化类游戏为灵感。模型使用 <a href="https://quaternius.com/" target="_blank" rel="noopener noreferrer">Quaternius</a> 的 Ultimate Monsters 与 Ultimate Animated Animals（CC0），部分图鉴缩略图来自其 Poly Pizza 镜像；程序生成的备用模型与花纹由本项目绘制。场景同时使用 Kenney 的 CC0 资源，完整来源见项目 ATTRIBUTION.md。</p></details>
+      </section>
+
+      <section class="panel camera-interaction-panel" id="cameraInteractionPanel" data-workspace-section="interaction">
+        <div class="panel-head">
+          <div><p class="kicker">05 · 可移动主人机器人</p><h2>走进它的世界，面对面逗逗它</h2></div>
+          <span class="camera-privacy">本机识别 · 不保存视频</span>
+        </div>
+        <div class="camera-interaction-layout">
+          <div class="camera-preview" id="cameraPreview">
+            <video id="interactionVideo" playsinline muted></video>
+            <canvas id="interactionOverlay" aria-hidden="true"></canvas>
+            <div class="camera-placeholder" id="cameraPlaceholder"><b>📺</b><span>摄像头尚未开启</span><small>只有点击“开启摄像头”后才会请求权限</small></div>
+          </div>
+          <div class="camera-interaction-copy">
+            <div class="camera-status-row"><span id="cameraStatusDot"></span><strong id="cameraInteractionStatus">等待开启摄像头</strong></div>
+            <div class="camera-reaction" id="cameraReaction"><b>🐾</b><div><strong>精灵正在等待你</strong><span>手势可以下达过来、散步、觅食、停下和表演指令；表情会触发情绪回应。</span></div></div>
+            <div class="camera-actions">
+              <button id="toggleCamera" type="button">开启摄像头</button>
+              <button id="callToScreen" type="button">🔔 呼唤到机器人正面</button>
+              <button id="videoCallView" type="button">📹 机器人视频第一视角</button>
+            </div>
+            <div class="gesture-command-guide" aria-label="视频动作指令说明">
+              <button type="button" data-social-command="come"><b>👋 张开手掌</b><span>呼唤过来</span></button>
+              <button type="button" data-social-command="walk"><b>☝️ 举起一指</b><span>去散步</span></button>
+              <button type="button" data-social-command="eat"><b>👎 拇指向下</b><span>寻找食物</span></button>
+              <button type="button" data-social-command="stay"><b>✊ 握拳</b><span>停下等待</span></button>
+              <button type="button" data-social-command="perform"><b>✌️ 剪刀手</b><span>转圈表演</span></button>
+              <button type="button" data-social-command="praise"><b>👍 点赞</b><span>表扬鼓励</span></button>
+            </div>
+            <section class="social-action-panel" aria-labelledby="socialActionsTitle"><h3 id="socialActionsTitle">不用摄像头，也能逗逗它</h3><div class="social-action-grid" role="group" aria-label="手动测试伙伴互动动作">
+              <button type="button" data-social-action="greet">👋 招手问好</button><button type="button" data-social-action="roll">🌀 打个滚</button><button type="button" data-social-action="rub">💗 撒娇蹭蹭</button><button type="button" data-social-action="tilt">🐾 歪头看你</button><button type="button" data-social-action="blink">😉 眨眼回应</button><button type="button" data-social-action="smile">😊 开心微笑</button><button type="button" data-social-action="eat">🍓 去吃甜果</button><button type="button" data-social-action="rest">💤 坐下休息</button>
+            </div><small>这些按钮和摄像头识别共用社交动作层，可在拒绝摄像头权限时继续试玩。打滚会先落地并暂停行走；蹭蹭先靠近机器人。部分纹理眼睛模型暂不能单独闭眼。上方“接管主人移动”使用 W/A/S/D 或方向键，视频镜头会跟随机器人位置。</small></section>
+            <p>本机人体识别只使用 MediaPipe 已支持的 7 类手势，以及微笑、双眼眨眼、惊讶表情系数；稳定识别并冷却后才触发，不会每帧重复命令。任意肢体动作、情绪或身份不会被声称为已识别。它们进入新增“社交互动层”，不是果蝇原始神经子回路天然会认人；跑步、表演、格斗和技能发射主要由游戏身体适配器执行。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel duel-panel" id="duelPanel" data-workspace-section="duel">
+        <div class="panel-head">
+          <div><p class="kicker">BATTLE GROVE · 实战也是成长</p><h2>精灵属性竞技场</h2><p class="panel-subtitle">挑选双方伙伴，观察不同身体、属性和性格带来的战术。</p></div>
+          <div class="duel-controls">
+            <label class="species-choice">我方伙伴<select id="playerSpeciesSelect" aria-label="选择我方对战精灵"></select></label>
+            <label class="species-choice">对战伙伴<select id="rivalSpeciesSelect" aria-label="选择对手精灵"></select></label>
+            <label>我方体型<select id="playerBodyType"><option value="aerial">飞行绒团萤翼兽</option><option value="biped">瘦高关节迅影兽</option><option value="corgi">软肚短腿小柯基</option><option value="cat">四足软萌小猫</option></select></label>
+            <label>对手体型<select id="rivalBodyType"><option value="aerial">飞行绒团萤翼兽</option><option value="biped">瘦高关节迅影兽</option><option value="corgi">软肚短腿小柯基</option><option value="cat">四足软萌小猫</option></select></label>
+            <label>我方性格<select id="duelPlayerPersonality"><option value="balanced">稳健型</option><option value="brave">勇猛型</option><option value="cautious">谨慎型</option><option value="curious">好奇型</option></select></label>
+            <label>对手性格<select id="duelRivalPersonality"><option value="balanced">稳健型</option><option value="brave">勇猛型</option><option value="cautious" selected>谨慎型</option><option value="curious">好奇型</option></select></label>
+            <label>我方属性<select id="duelPlayerElement"></select></label>
+            <label>对手属性<select id="duelRivalElement"></select></label>
+            <label>我方翅膀<select id="playerWingStyle"><option value="butterfly">宽圆蝶翼</option><option value="mini">小圆龙翼</option><option value="petal">花瓣扇翼</option></select></label>
+            <label>对手翅膀<select id="rivalWingStyle"><option value="mini">小圆龙翼</option><option value="butterfly">宽圆蝶翼</option><option value="petal">花瓣扇翼</option></select></label>
+            <label>追击策略<select id="duelPursuit"><option value="adaptive">判断后追击</option><option value="always">穷追不舍</option><option value="never">不追逃敌</option></select></label>
+            <button id="startDuel" type="button">开始对战</button>
+            <button id="stopDuel" class="stop-duel-button" type="button" disabled>停止对战 · 不领奖励</button>
+          </div>
+        </div>
+        <div class="duel-scoreboard">
+          <article class="duel-fighter player" id="duelPlayerCard"><header><span id="duelPlayerName">我的萤翼龙</span><em id="duelPlayerType">无属性</em></header><progress id="duelPlayerHealth" max="1" value="1"></progress><small><b id="duelPlayerHealthText">280 / 280</b><span id="duelPlayerSkills">冲刺撞击</span></small><i class="duel-tactic" id="duelPlayerTactic">等待起飞 · 0m</i></article>
+          <div class="duel-versus"><strong>VS</strong><span id="duelState">选择属性后开始</span></div>
+          <article class="duel-fighter rival" id="duelRivalCard"><header><span id="duelRivalName">对战伙伴</span><em id="duelRivalType">水</em></header><progress id="duelRivalHealth" max="1" value="1"></progress><small><b id="duelRivalHealthText">295 / 295</b><span id="duelRivalSkills">水流弹 · 潮汐环</span></small><i class="duel-tactic" id="duelRivalTactic">等待起飞 · 0m</i></article>
+        </div>
+        <p class="duel-sense-readout" id="duelVisionReadout">战斗感知：视觉只在有效距离内锁定；气味标记命中后，嗅觉可以跨越整张地图追踪。</p>
+        <p class="duel-sense-readout" id="duelStrategyReadout">战斗人格：开始对战后，将根据双方性格、实时战力、生命、体力和疲劳解释各自策略。</p>
+        <details class="attribute-chart-panel"><summary>属性相克表 · 招式属性 × 目标属性</summary><p>行是攻击属性，列是防守属性；倍率作用于技能伤害，不直接决定输赢。生命、防御、距离和能否命中仍然重要。</p><div class="attribute-chart-legend"><span class="strong">优势 ＞ 1×</span><span class="weak">受克 ＜ 1×</span><span>普通 1×</span></div><div id="attributeChart" class="attribute-chart-scroll" tabindex="0" aria-label="可左右滚动的完整属性伤害倍率表"></div></details>
+        <p class="science-boundary">实现边界：真实连接组只运行选取的感觉—运动子回路，不是完整果蝇大脑；目标判断、战术、步态、受击、属性与成长主要由游戏规则和身体适配层完成。</p>
+        <p class="duel-explanation">双方各自运行一个独立连接组实例：共享同一份只读 MaleCNS 线路图，但实时电位、感知输入和随机状态互不串线。身体决定“能够怎样行动”，战斗人格决定“愿意承担多少风险”：勇猛型更频繁进攻和追击，谨慎型更早闪避并保持距离，好奇型延长试探，稳健型在攻防之间折中；这些倾向还会被双方属性战力、实时生命、体力、疲劳、自信、恐惧及历史战斗经验持续修正，所以勇猛个体在明显无胜算时也可能撤退。不同身体使用不同战术控制器：飞行萤翼兽可以在三维空间使用大范围航点、俯冲和脱离；地面精灵围绕敌人管理交战距离。连接组与战术层连续选择从静止到冲刺的速度，疲劳、疼痛和腿伤限制可维持速度，体力只解锁短暂的高速闪避。头部视线是独立自由度，可先转头寻找食物、盯住敌人或观察最后目击位置，再决定身体是否转向。小柯基的短腿使用整腿摆动，但骨盆、软肚、胸腔和头部通过延迟弹簧逐级传递脚步，形成左右扭动与软弹起伏。四足小猫使用前后四条独立分段腿，低速采用四拍步行、高速过渡到对角小跑；扑击、闪避、前爪和后足技能都有独立姿态，尾巴辅助表达平衡。小猫的脸纹、腹纹与条纹由皮毛材质直接绘制，不是凸出的几何块。三种地面身体都拥有按冲击方向变化的失衡、倒地和起身阶段；倒地时运动与施法被锁定，对手转入警戒而不会持续攻击，几何边界还会实时校正到地面以上。DNp09/DNg100 提供“向前运动强度”，DNa02 左/右提供转向差值；具体步态、闪避和格斗动作属于透明标注的游戏身体适配层，不冒充果蝇原生格斗能力。</p>
+      </section>
+
+      <section class="systems-grid" data-workspace-section="science">
+        <section class="panel biology-panel">
+          <div class="panel-head">
+            <div><p class="kicker">07 · 完整生物状态</p><h2>身体、代谢、感官与个体差异</h2></div>
+            <div class="bio-actions"><button id="randomizeCreature">生成新个体</button><button id="healCreature">休息治疗</button><button id="injureWing">模拟翅伤</button></div>
+          </div>
+          <div class="bio-layout">
+            <div class="vital-grid">
+              <label><span>饥饿</span><strong id="bioHungerValue">72%</strong><progress id="bioHunger" max="1"></progress></label>
+              <label><span>体力</span><strong id="bioStaminaValue">100%</strong><progress id="bioStamina" max="1"></progress></label>
+              <label><span>生命</span><strong id="bioHealthValue">90%</strong><progress id="bioHealth" max="1"></progress></label>
+              <label><span>疲劳</span><strong id="bioFatigueValue">12%</strong><progress id="bioFatigue" max="1"></progress></label>
+              <label><span>疼痛</span><strong id="bioPainValue">0%</strong><progress id="bioPain" max="1"></progress></label>
+              <label><span>压力</span><strong id="bioStressValue">16%</strong><progress id="bioStress" max="1"></progress></label>
+              <label><span>兴奋</span><strong id="bioArousalValue">28%</strong><progress id="bioArousal" max="1"></progress></label>
+              <label><span>中毒</span><strong id="bioPoisonValue">0%</strong><progress id="bioPoison" max="1"></progress></label>
+            </div>
+            <div class="trait-column">
+              <h3>先天体质 <small>每个个体可以不同</small></h3>
+              <div id="traitGrid" class="trait-grid"></div>
+              <h3>伤势与功能</h3>
+              <div class="injury-row"><span>萤翼损伤 <b id="wingInjury">0%</b></span><span>四肢损伤（综合）<b id="legInjury">0%</b></span><span id="flightCapability">可以正常飞行</span></div>
+            </div>
+          </div>
+          <p id="biologyExplanation" class="system-explanation">饥饿会放大食物气味和觅食优先级；疲劳、疼痛与伤势会降低速度、战斗力和感官表现。</p>
+        </section>
+
+        <section class="panel skills-panel">
+          <div class="panel-head"><div><p class="kicker">08 · 技能与属性接口</p><h2>近战、远程、范围与防御</h2></div></div>
+          <div class="element-controls">
+            <label>自身属性<select id="creatureElement"></select></label>
+            <span>对抗</span>
+            <label>敌人属性<select id="enemyElement"></select></label>
+            <strong id="elementHint">属性倍率将在释放技能时计算</strong>
+          </div>
+          <div id="skillGrid" class="skill-grid"></div>
+          <p class="system-explanation">所有技能共用统一接口：类型、属性、距离、范围、体力消耗、冷却、伤害、等级和状态效果。以后添加新属性或新技能不需要修改三维运动系统。</p>
+        </section>
+      </section>
+
+      <section class="lower-grid" data-workspace-section="science">
+        <section class="panel brain-panel">
+          <div class="panel-head">
+            <div><p class="kicker">09 · 实时活动</p><h2>连接组子网络</h2></div>
+            <div class="brain-legend"><span class="exc">兴奋</span><span class="inh">抑制</span><span class="firing">放电</span></div>
+          </div>
+          <canvas id="brain" width="1180" height="420" aria-label="果蝇连接组活动"></canvas>
+        </section>
+
+        <section class="panel log-panel">
+          <div class="panel-head compact"><div><p class="kicker">10 · 可解释记录</p><h2>刚才发生了什么</h2></div></div>
+          <ol id="eventLog" class="event-log"></ol>
+          <div class="honesty">
+            <strong>科学边界</strong>
+            <p>当前只运行真实连接组中的感觉—运动子网络，不是完整果蝇大脑。亲密、恐惧、攻击经验、战术与动作动画由透明的游戏扩展层和身体适配器实现，不声称是果蝇原生格斗或完整认知。</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel explainer-panel" data-workspace-section="science">
+        <div class="panel-head"><div><p class="kicker">11 · 实现说明</p><h2>哪些来自果蝇大脑，哪些是我们新加的？</h2></div><span class="truth-key">真实通道 ≠ 游戏扩展</span></div>
+        <div class="explain-columns">
+          <div>
+            <h3><i class="truth-dot real"></i>真实连接组通道</h3>
+            <article><strong>逼近视觉 → 逃逸</strong><p><code>LC4 / LPLC2 → DNp01</code>：发现快速变大的物体，经过真实突触网络产生逃跑输出。</p></article>
+            <article><strong>食物气味 → 转向接近</strong><p><code>ORN、DM1、VA2</code>：左右气味强度不同时改变转向，让身体寻找气味源。</p></article>
+            <article><strong>甜味 → 进食</strong><p><code>LB3、PhG1 → MN9</code>：接触甜味后，真实连接传播到控制口器的运动输出。</p></article>
+            <article><strong>苦味 → 拒食</strong><p><code>LB1 → GNG087</code>：苦味通道兴奋，抑制进食输出并促使身体转开。</p></article>
+          </div>
+          <div>
+            <h3><i class="truth-dot learned"></i>新增可塑学习层</h3>
+            <article><strong>认主人</strong><p>喂食和抚摸提供正奖励，增强“主人特征 → 接近”的可塑权重；惊吓增加恐惧并削弱接近。</p></article>
+            <article><strong>局势判断</strong><p>敌人强弱、敌意、攻击收益、生命体力和退路共同形成胜算；弱小且无敌意、无收益的目标通常会被无视。</p></article>
+            <article><strong>性格与指令</strong><p>勇猛、谨慎、好奇和忠诚改变各行动的权重。主人可以下令，但低胜算会削弱攻击命令，身体无路可逃也会削弱撤退选择。</p></article>
+            <article><strong>冲刺攻击</strong><p>攻击熟练度、自信、胜算与收益形成攻击意愿，并与真实的 DNp01 逃逸冲动竞争。</p></article>
+            <article><strong>多身体适配器</strong><p>连接组只输出前进、转向、追逐和逃逸等高层意图；飞行体把它翻译为拍翼和三维航线，双足体则翻译为左右交替跑步、蓄力跳跃、格挡与分手施法，因此换外形不用伪造或改写原始果蝇突触。</p></article>
+            <article><strong>学得更熟练</strong><p>训练或命中会增强技能权重；失败与受惊会降低自信。每次变化都显示在仪表和事件记录中。</p></article>
+            <article><strong>最终动作仲裁</strong><p>逃逸、进食、亲近与攻击同时竞争，最高且满足条件的倾向控制三维身体，而不是固定脚本直接播放。</p></article>
+          </div>
+        </div>
+        <div class="formula-strip"><span>攻击评分</span> = 胜算 × 性格 × 收益 × 敌人距离 + 主人指令　　<span>撤退评分</span> = 危险 × 谨慎 × 可逃脱程度 − 攻击胜算　　<span>亲近意愿</span> = 主人呼唤 × 亲密度 ×（1 − 恐惧）</div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
